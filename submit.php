@@ -50,6 +50,7 @@ $poiName		= ! empty( $_POST['poiName'] ) ? $_POST['poiName'] : '';
 $poiDescription		= ! empty( $_POST['poiDescription'] ) ? $_POST['poiDescription'] : '';
 $poiNotes		= ! empty( $_POST['poiNotes'] ) ? $_POST['poiNotes'] : '';
 $poiId			= ! empty( $_POST['poiId'] ) ? $_POST['poiId'] : '';
+$poiStatus			= ! empty( $_POST['poiStatus'] ) ? $_POST['poiStatus'] : '';
 $poiImage		= ! empty( $_POST['poiImage'] ) ? $_POST['poiImage'] : '';
 $poiSurrounding		= ! empty( $_POST['poiSurrounding'] ) ? $_POST['poiSurrounding'] : '';
 
@@ -160,6 +161,10 @@ if ( $action === "edit-poi" ) {
 }
 if ( $action === "delete-poi" ) {
     $submitManual->delete_poi($poiId, $loggedUser);
+}
+if ( $action === "updatepoistatus" ) {
+    #$submitManual->mark_poi_submitted($poiId, $loggedUser);
+    $submitManual->update_poi_status($poiId, $poiStatus, $loggedUser);
 }
 if ( $action === "markpoisubmitted" ) {
     #$submitManual->mark_poi_submitted($poiId, $loggedUser);

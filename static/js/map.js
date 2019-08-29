@@ -4195,6 +4195,38 @@ function submitPoi(event) { // eslint-disable-line no-unused-vars
     }
 }
 
+function updatePOIStatus(event) { // eslint-disable-line no-unused-vars
+    var form = $(event.target).parent().parent()
+    var poiId = form.find('.markpoiid').val()
+    var poiId = form.find('.markpoiid').val()
+    if (poiId && poiId !== '') {
+        if (confirm(i8ln('I confirm this candidate is submitted to OPR'))) {
+            return $.ajax({
+                url: 'submit',
+                type: 'POST',
+                timeout: 300000,
+                dataType: 'json',
+                cache: false,
+                data: {
+                    'action': 'updatepoistatus',
+                    'poiId': poiId,
+                    'poiStatus' : poiStatus
+                },
+                error: function error() {
+                    // Display error toast
+                    toastr['error'](i8ln('Candidate id got lost somewhere.'), i8ln('Error marking candidate'))
+                    toastr.options = toastrOptions
+                },
+                complete: function complete() {
+                    lastpois = false
+                    updateMap()
+                    $('.ui-dialog-content').dialog('close')
+                }
+            })
+        }
+    }
+}
+
 function markPoiSubmitted(event) { // eslint-disable-line no-unused-vars
     var form = $(event.target).parent().parent()
     var poiId = form.find('.markpoiid').val()
