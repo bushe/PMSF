@@ -1547,6 +1547,14 @@ if ( $blockIframe ) {
     <?php } ?>
     <?php if ( ! $noPoi ) { ?>
         <div class="mark-poi-modal" style="display: none;">
+            <h3>Select POI Status</h3>
+            <select id="select-poi-status">
+                <option value=1>New</option>
+                <option value=2>Submitted</option>
+                <option value=3>Declined</option>
+                <option value=4>Eligible for Resubmit</option>
+                <option value=5>Not Eligible</option>
+            </select>
             <div class="button-container">
                 <button type="button" onclick="markPoiSubmitted(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Submitted' ); ?></button>
                 <button type="button" onclick="markPoiDeclined(event);" class="markpoiid"><i class="fas fa-times"></i> <?php echo i8ln( 'Declined' ); ?></button>
