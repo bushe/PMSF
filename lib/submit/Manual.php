@@ -521,10 +521,6 @@ class Manual extends Submit
                             array(
                                 "name" => 'POI ID:',
                                 "value" => $poiId
-                            ),
-                            array(
-                                "name" => 'Map link',
-                                "value" => '[View POI on Map](' . $submitMapUrl . '/?lat=' . $lat . '&lon=' . $lon . '&zoom=18)'
                             )
                         )
                     ))
