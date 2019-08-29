@@ -4195,7 +4195,7 @@ function submitPoi(event) { // eslint-disable-line no-unused-vars
     }
 }
 
-function updatePOIStatus(event) { // eslint-disable-line no-unused-vars
+function updatePoiStatus(event) { // eslint-disable-line no-unused-vars
     var form = $(event.target).parent().parent()
     var poiId = form.find('.markpoiid').val()
     var poiId = form.find('.markpoiid').val()
