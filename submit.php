@@ -162,16 +162,20 @@ if ( $action === "delete-poi" ) {
     $submitManual->delete_poi($poiId, $loggedUser);
 }
 if ( $action === "markpoisubmitted" ) {
-    $submitManual->mark_poi_submitted($poiId, $loggedUser);
+    #$submitManual->mark_poi_submitted($poiId, $loggedUser);
+    $submitManual->update_poi_status($poiId, 2, $loggedUser);
 }
 if ( $action === "markpoideclined" ) {
-    $submitManual->mark_poi_declined($poiId, $loggedUser);
+    #$submitManual->mark_poi_declined($poiId, $loggedUser);
+    $submitManual->update_poi_status($poiId, 3, $loggedUser);
 }
 if ( $action === "markpoiresubmit" ) {
-    $submitManual->mark_poi_resubmit($poiId, $loggedUser);
+    #$submitManual->mark_poi_resubmit($poiId, $loggedUser);
+    $submitManual->update_poi_status($poiId, 4, $loggedUser);
 }
 if ( $action === "marknotcandidate" ) {
-    $submitManual->mark_not_candidate($poiId, $loggedUser);
+    #$submitManual->mark_not_candidate($poiId, $loggedUser);
+    $submitManual->update_poi_status($poiId, 5, $loggedUser);
 }
 $jaysson = json_encode($d);
 echo $jaysson;
