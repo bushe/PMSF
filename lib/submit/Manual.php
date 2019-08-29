@@ -499,12 +499,6 @@ class Manual extends Submit
                     "username" => $loggedUser, 
                     "embeds" => array(array(
                         "color" => $statusColor[$status],
-                        "image" => array(
-                            "url" => $poiImageUrl
-                        ),
-                        "thumbnail" => array(
-                            "url" => $poiSurroundingUrl
-                        ),
                         "fields" => array(
                             array(
                                 "name" => 'Manual Action:',
@@ -513,10 +507,6 @@ class Manual extends Submit
                             array(
                                 "name" => 'POI Title:',
                                 "value" => $poiName
-                            ),
-                            array(
-                                "name" => 'POI Description:',
-                                "value" => $poiDescription
                             ),
                             array(
                                 "name" => 'POI ID:',
