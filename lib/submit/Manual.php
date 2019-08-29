@@ -487,7 +487,7 @@ class Manual extends Submit
                 5 => "Not Eligible"
             );
             $statusColor = array(
-                1 => 255
+                1 => 255,
                 2 => 32768,
                 3 => 16711680,
                 4 => 16711935,
