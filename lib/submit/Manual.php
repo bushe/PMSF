@@ -515,11 +515,6 @@ class Manual extends Submit
                         )
                     ))
                 );
-                $data2 = array(
-                    "content" => '```Marked poi with id "' . $poiId . '." As submitted. PoiName: "' . $poiName['name'] . '". ```',
-                    "username" => $loggedUser
-                );
-                sendToWebhook($discordSubmitLogChannelUrl, ($data2));
                 sendToWebhook($discordSubmitLogChannelUrl, ($data));
             }
         }
