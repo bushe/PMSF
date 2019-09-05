@@ -69,8 +69,6 @@ if (strtolower($map) === "rdm") {
 } else if (strtolower($map) === "monocle") {
     if (strtolower($fork) === "pmsf") {
         $submit = new \Submit\Monocle_PMSF();
-    } elseif (strtolower($fork) === "mad") {
-        $submit = new \Submit\Monocle_MAD();
     }
 }
 $submitManual = new \Submit\Manual();
@@ -89,6 +87,9 @@ if ( $action === "toggle-ex-gym" ) {
 }
 if ( $action === "delete-gym" ) {
     $submit->delete_gym($gymId, $loggedUser);
+}
+if ( $action === "renamegym" ) {
+    $submit->modify_gym($gymId, $gymName, $loggedUser);
 }
 if ( $action === "pokestop" ) {
     $submit->submit_pokestop($lat, $lon, $pokestopName, $loggedUser);
