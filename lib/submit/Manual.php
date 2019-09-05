@@ -515,7 +515,7 @@ class Manual extends Submit
                         )
                     ))
                 );
-                sendToWebhook($discordSubmitLogChannelUrl, ($data));
+                sendToWebhook($discordPOISubmitLogChannelUrl, ($data));
             }
         }
     }
