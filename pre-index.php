@@ -1560,11 +1560,11 @@ if ( $blockIframe ) {
     <?php if ( ! $noPoi ) { ?>
         <div class="mark-poi-modal" style="display: none;">
             <div class="button-container">
-                <button type="button" onclick="updatePoiStatus(1, event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'New' ); ?></button>
+                <button type="button" onclick="updatePoiStatus(1, event);" class="markpoiid"><i class="fas fa-tag"></i> <?php echo i8ln( 'New' ); ?></button>
                 <button type="button" onclick="updatePoiStatus(2, event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Submitted' ); ?></button>
-                <button type="button" onclick="updatePoiStatus(3, event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Declined' ); ?></button>
-                <button type="button" onclick="updatePoiStatus(4, event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Resubmit' ); ?></button>
-                <button type="button" onclick="updatePoiStatus(5, event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Not a candidate' ); ?></button>
+                <button type="button" onclick="updatePoiStatus(3, event);" class="markpoiid"><i class="fas fa-exclamation-triangle"></i> <?php echo i8ln( 'Declined' ); ?></button>
+                <button type="button" onclick="updatePoiStatus(4, event);" class="markpoiid"><i class="fas fa-redo"></i> <?php echo i8ln( 'Resubmit' ); ?></button>
+                <button type="button" onclick="updatePoiStatus(5, event);" class="markpoiid"><i class="fas fa-stop-circle"></i> <?php echo i8ln( 'Not a candidate' ); ?></button>
             </div>
         </div>
     <?php } ?>
