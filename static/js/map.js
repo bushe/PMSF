@@ -4199,7 +4199,7 @@ function updatePoiStatus(event) { // eslint-disable-line no-unused-vars
     var form = $(event.target).parent().parent()
     var poiId = form.find('.markpoiid').val()
     var poiStatus = form.find('.select-poi-status').val()
-    if (poiId && poiId !== '') {
+    if (poiId && poiId !== '' && poiStatus > 0) {
         if (confirm(i8ln('I confirm this candidate is submitted to OPR'))) {
             return $.ajax({
                 url: 'submit',
