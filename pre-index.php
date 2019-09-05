@@ -1559,15 +1559,12 @@ if ( $blockIframe ) {
     <?php } ?>
     <?php if ( ! $noPoi ) { ?>
         <div class="mark-poi-modal" style="display: none;">
-            <select id="select-poi-status" name="select-poi-status" class="select-poi-status">
-                <option value=1>New</option>
-                <option value=2>Submitted</option>
-                <option value=3>Declined</option>
-                <option value=4>Eligible for Resubmit</option>
-                <option value=5>Not Eligible</option>
-            </select>
             <div class="button-container">
-                <button type="button" onclick="updatePoiStatus(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Save' ); ?></button>
+                <button type="button" onclick="markPoiNew(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'New' ); ?></button>
+                <button type="button" onclick="markPoiSubmitted(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Submitted' ); ?></button>
+                <button type="button" onclick="markPoiDeclined(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Declined' ); ?></button>
+                <button type="button" onclick="markPoiResubmit(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Resubmit' ); ?></button>
+                <button type="button" onclick="markNotCandidate(event);" class="markpoiid"><i class="fas fa-sync-alt"></i> <?php echo i8ln( 'Not a candidate' ); ?></button>
             </div>
         </div>
     <?php } ?>
