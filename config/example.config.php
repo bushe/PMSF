@@ -56,9 +56,21 @@ $title = "POGOmap";                                                 // Title to 
 $locale = "en";                                                     // Display language
 $raidmapLogo = '';                                                  // Upload logo to custom folder, leave '' for empty ( $raidmapLogo = 'custom/logo.png'; )
 
-/* Google Maps ONLY USED FOR TILE LAYERS */
+/* Google Maps and MapBox are ONLY USED FOR TILE LAYERS */
 
 $gmapsKey = "";
+$mBoxKey = "";
+
+/* How to use multiple Map Box Keys: */
+
+//$dayOfTheWeek = date('l');
+//If ($dayOfTheWeek === 'Monday' || $dayOfTheWeek === 'Tuesday' || $dayOfTheWeek === 'Wednesday') {
+//    $mBoxKey = "";
+//} else if ($dayOfTheWeek === 'Thursday' || $dayOfTheWeek === 'Friday') {
+//    $mBoxKey = "";
+//} else if ($dayOfTheWeek === 'Saturday' || $dayOfTheWeek === 'Sunday') {
+//    $mBoxKey = "";
+//}
 
 /* Google Analytics */
 
@@ -311,11 +323,12 @@ $hideIfManual = false;
 $noManualRaids = true;						 			                                // Enable/Disable ManualRaids permanently ( Comment this line if you want to use the block below )
 $noDiscordSubmitLogChannel = true;                                  			        // Send webhooks to discord channel upon submission
 $submitMapUrl = '';
-$discordSubmitLogChannelUrl = 'https://discordapp.com/api/webhooks/<yourCHANNELhere>';  // Sends gym/pokestop submit & pokestop rename directly to discord
-
+$discordSubmitLogChannelUrl = 'https://discordapp.com/api/webhooks/<yourCHANNELhere>';  // Sends gym/pokestop submit & pokestop rename directly to discord can also be an array ['URL', 'URL'] or as many as you like.
+$discordPOISubmitLogChannelUrl = 'https://discordapp.com/api/webhooks/<yourCHANNELhere>';  // Sends gym/pokestop submit & pokestop rename directly to discord can also be an array ['URL', 'URL'] or as many as you like.
 $noManualPokemon = true;
 $pokemonTimer = 900;                                                                    // Time in seconds before a submitted Pokémon despawns. (not used atm)
 $noManualGyms = true;
+$noRenameGyms = true;
 $noManualPokestops = true;
 $noRenamePokestops = true;
 $noConvertPokestops = true;
@@ -454,7 +467,7 @@ $enableDebug = false;
 // DATABASE CONFIG
 //-----------------------------------------------------
 $map = "rdm";                                                       // {monocle}/{rdm}/{rocketmap}
-$fork = "default";                                                  // {default/alternate/mad}/{default/beta}/{mad}
+$fork = "default";                                                  // {default/alternate}/{default/beta}/{mad}
 $queryInterval = '2500';                                            // Interval between raw_data requests. Try to lower to increase performance.
 
 $db = new Medoo([// required
