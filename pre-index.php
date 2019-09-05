@@ -1521,18 +1521,6 @@ if ( $blockIframe ) {
 	        <input type="text" id="poi-name" name="poi-name" placeholder="<?php echo i8ln( 'Enter New POI Name' ); ?>" data-type="poi-name" class="search-input">
 	        <input type="text" id="poi-description" name="poi-description" placeholder="<?php echo i8ln( 'Enter New POI Description' ); ?>" data-type="poi-description" class="search-input">
 	        <input type="text" id="poi-notes" name="poi-notes"placeholder="<?php echo i8ln( 'Enter New POI Notes' ); ?>" data-type="poi-notes" class="search-input">
-<<<<<<< HEAD
-                <div class="upload-button-container">
-                     <button type="button">Upload new POI Image</button>
-                     <input type="file" id="poi-image" name="poi-image" accept="image/*" class="poi-image" data-type="poi-image" class="search-input" onchange='previewPoiImage(event)' >
-		</div>
-                <center><img id='preview-poi-image' name='preview-poi-image' width="50px" height="auto"></center>
-                <div class="upload-button-container">
-                     <button type="button">Upload new POI Image</button>
-                     <input type="file" id="poi-surrounding" name="poi-surrounding" accept="image/*" class="poi-surrounding" data-type="poi-surrounding" class="search-input" onchange='previewPoiSurrounding(event)'>
-		</div>
-                <center><img id='preview-poi-surrounding' name='preview-poi-surrounding' width="50px" height="auto"></center>
-=======
                 <?php if ( ! empty( $imgurCID ) ) {
                     ?>
                     <div class="upload-button-container">
@@ -1546,7 +1534,6 @@ if ( $blockIframe ) {
                     </div>
                     <center><img id='preview-poi-surrounding' name='preview-poi-surrounding' width="50px" height="auto"></center>
                 <?php } ?>
->>>>>>> a4db754cd1e5ca7886e7bbf1e0b46cde8d743299
 	        <div class="button-container">
                 <button type="button" onclick="editPoiData(event);" class="editpoiid"><i class="fas fa-save"></i> <?php echo i8ln( 'Save Changes' ); ?></button>
             </div>
@@ -1945,18 +1932,6 @@ if ( $blockIframe ) {
                         <input type="text" name="poi-name" class="poi-name"placeholder="<?php echo i8ln( 'Enter candidate Name' ); ?>" data-type="name" class="search-input">
                         <input type="text" name="poi-description" class="poi-description" placeholder="<?php echo i8ln( 'Enter candidate description' ); ?>" data-type="description" class="search-input">
                         <input type="text" name="poi-notes" class="poi-notes" placeholder="<?php echo i8ln( 'Enter field notes' ); ?>" data-type="description" class="search-input">
-<<<<<<< HEAD
-                        <div class="upload-button-container">
-                            <button type="button">Upload POI Image</button>
-                            <input type="file" id="poi-image" name="poi-image" accept="image/*" class="poi-image" data-type="poi-image" class="search-input" onchange='previewPoiImage(event)'>
-                        </div>
-                        <center><img id='preview-poi-image' name='preview-poi-image' width="50px" height="auto"></center>
-                        <div class="upload-button-container">
-                            <button type="button">Upload Surrounding Image</button>
-			    <input type="file" id="poi-surrounding" name="poi-surrounding" accept="image/*" class="poi-surrounding" data-type="poi-surrounding" class="search-input" onchange='previewPoiSurrounding(event)'>
-                        </div>
-                        <center><img id='preview-poi-surrounding' name='preview-poi-surrounding' width="50px" height="auto" ></center>
-=======
                         <?php if ( ! empty( $imgurCID ) ) {
                             ?>
                             <div class="upload-button-container">
@@ -1970,7 +1945,6 @@ if ( $blockIframe ) {
                             </div>
                             <center><img id='preview-poi-surrounding' name='preview-poi-surrounding' width="50px" height="auto" ></center>
                         <?php } ?>
->>>>>>> a4db754cd1e5ca7886e7bbf1e0b46cde8d743299
                         <div class="button-container">
                             <h6><center><?php echo i8ln( 'If you submit a POI candidate you agree that your discord username will be shown in the marker label' ); ?></center></h6>
                             <button type="button" onclick="submitPoi(event);" class="submitting-poi"><i class="fas fa-comments"></i> <?php echo i8ln( 'Submit POI candidate' ); ?></button>
