@@ -2499,6 +2499,15 @@ function setupPoiMarker(item) {
             weight: 1,
             pane: 'portals'
         }
+    } else if (item.status === '6') {
+        circle = {
+            color: '#EA00FF',
+            radius: 10,
+            fillOpacity: 1,
+            fillColor: '#008000',
+            weight: 3,
+            pane: 'portals'
+        }
     }
     var marker = L.circleMarker([item['lat'], item['lon']], circle).bindPopup(poiLabel(item), {autoPan: false, closeOnClick: false, autoClose: false})
     markers.addLayer(marker)

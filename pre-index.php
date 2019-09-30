@@ -1519,7 +1519,7 @@ if ( $blockIframe ) {
     <?php if ( ! $noEditPoi ) { ?>
         <div class="editpoi-modal" style="display: none;">
 	        <input type="text" id="poi-name" name="poi-name" placeholder="<?php echo i8ln( 'Enter New POI Name' ); ?>" data-type="poi-name" class="search-input">
-	        <input type="text" id="poi-description" name="poi-description" placeholder="<?php echo i8ln( 'Enter New POI Description' ); ?>" data-type="poi-description" class="search-input">
+	        <input type="text" id="poi-description" maxlength="255" name="poi-description" placeholder="<?php echo i8ln( 'Enter New POI Description' ); ?>" data-type="poi-description" class="search-input">
 	        <input type="text" id="poi-notes" name="poi-notes"placeholder="<?php echo i8ln( 'Enter New POI Notes' ); ?>" data-type="poi-notes" class="search-input">
                 <?php if ( ! empty( $imgurCID ) ) {
                     ?>
@@ -1565,6 +1565,7 @@ if ( $blockIframe ) {
                 <button type="button" onclick="updatePoiStatus(3, event);" class="markpoiid"><i class="fas fa-exclamation-triangle"></i> <?php echo i8ln( 'Declined' ); ?></button>
                 <button type="button" onclick="updatePoiStatus(4, event);" class="markpoiid"><i class="fas fa-redo"></i> <?php echo i8ln( 'Resubmit' ); ?></button>
                 <button type="button" onclick="updatePoiStatus(5, event);" class="markpoiid"><i class="fas fa-stop-circle"></i> <?php echo i8ln( 'Not a candidate' ); ?></button>
+                <button type="button" onclick="updatePoiStatus(6, event);" class="markpoiid"><i class="fas fa-question-circle"></i> <?php echo i8ln( 'Other' ); ?></button>
             </div>
         </div>
     <?php } ?>
