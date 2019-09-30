@@ -486,13 +486,15 @@ class Manual extends Submit
                 3 => "Declined",
                 4 => "Eligible for Resubmit",
                 5 => "Not Eligible"
+                6 => "Not Eligible"
             );
             $statusColor = array(
                 1 => 255,
                 2 => 32768,
                 3 => 16711680,
                 4 => 16711935,
-                5 => 16742912
+                5 => 16742912,
+                6 => 15335679
             );
             $manualdb->update( "poi", $cols, $where );
             if ( $noDiscordSubmitLogChannel === false ) {

@@ -164,7 +164,6 @@ if ($action === "delete-poi") {
     $submitManual->delete_poi($poiId, $loggedUser);
 }
 if ( $action === "updatepoistatus" ) {
-    #$submitManual->mark_poi_submitted($poiId, $loggedUser);
     $submitManual->update_poi_status($poiId, $poiStatus, $loggedUser);
 }
 $jaysson = json_encode($d);
