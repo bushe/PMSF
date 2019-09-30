@@ -485,8 +485,8 @@ class Manual extends Submit
                 2 => "Submitted",
                 3 => "Declined",
                 4 => "Eligible for Resubmit",
-                5 => "Not Eligible"
-                6 => "Not Eligible"
+                5 => "Not Eligible",
+                6 => "Other"
             );
             $statusColor = array(
                 1 => 255,
