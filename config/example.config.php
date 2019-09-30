@@ -25,6 +25,7 @@ $startingLng = 5.302366;                                           // Starting l
 /* Zoom and Cluster Settings */
 
 $maxLatLng = 1;                                                     // Max latitude and longitude size (1 = ~110km, 0 to disable)
+$defaultZoom = 16;                                                  // Default zoom level for first time users.
 $maxZoomOut = 11;                                                   // Max zoom out level (11 ~= $maxLatLng = 1, 0 to disable, lower = the further you can zoom out)
 $maxZoomIn = 18;                                                    // Max zoom in level 18
 $disableClusteringAtZoom = 15;                                      // Disable clustering above this value. 0 to disable
@@ -84,13 +85,11 @@ $piwikSiteId = "";
 /* Cookie Disclamer */
 $noCookie = true;                                                   // Display a Cookie Disclamer
 
-/* PayPal */
-
+/* header urls */
 $paypalUrl = "";                                                    // PayPal donation URL, leave "" for empty
-
-/* Discord */
-
 $discordUrl = "https://discord.gg/INVITE_LINK";                     // Discord URL, leave "" for empty
+$whatsAppUrl = "";                                                  // WhatsApp URL, leave "" for empty
+$telegramUrl = "";                                                  // Telegram URL, leave "" for empty
 
 /* Worldopole */
 
@@ -181,10 +180,11 @@ $excludeMinIV = '[131, 143, 147, 148, 149, 248]';                   // [] for em
 $minIV = '0';                                                       // "0" for empty or a number
 $minLevel = '0';                                                    // "0" for empty or a number
 
-$noBigKarp = false;                                                 // BUGGED: Hides ALL Magikarp && the menu setting.
-$noBigKarpSetting = false;
-$noTinyRat = false;                                                 // BUGGED: Hides ALL Rattata && the menu setting.
-$noTinyRatSetting = false;
+$noBigKarp = false;
+$noTinyRat = false;
+
+$noDittoDetection = true;
+$possibleDitto = [13, 46, 48, 163, 165, 167, 187, 223, 273, 293, 300, 316, 322, 399];
 
 $noGyms = false;
 $enableGyms = 'false';
@@ -348,7 +348,7 @@ $enableLevel13Cells = 'false';
 $enableLevel14Cells = 'false';
 $enableLevel17Cells = 'false';
 $markPortalsAsNew = 86400;                         // Time in seconds to mark new imported portals as new ( 86400 for 1 day )
-$noPoi = true;					                   // Allow users to view POI markers 
+$noPoi = true;					                   // Allow users to view POI markers
 $noAddPoi = true;				                   // Allow to add POI markers (locations eligible for submitting Pokestops/Ingress portals)
 $enablePoi = 'false';
 $noDeletePoi = true;
@@ -423,7 +423,7 @@ $nestGeoJSONfile = 'custom/nest.json';			    // path to geoJSON file provided by
 //-----------------------------------------------
 // HPWU
 //-----------------------------------------------------
-$noInn = true;               // Enable/Disable the option to see inns 
+$noInn = true;               // Enable/Disable the option to see inns
 $enableInn = 'false';        // Enable/Disable inns by default. A user can edit this.
 $noDeleteInn = true;         // Enable/Disable option do delete a inn
 
@@ -471,7 +471,7 @@ $fork = "default";                                                  // {default/
 $queryInterval = '2500';                                            // Interval between raw_data requests. Try to lower to increase performance.
 
 $db = new Medoo([// required
-    'database_type' => 'mysql',                                    
+    'database_type' => 'mysql',
     'database_name' => 'Monocle',
     'server' => '127.0.0.1',
     'username' => 'database_user',
