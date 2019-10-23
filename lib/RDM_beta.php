@@ -48,12 +48,6 @@ class RDM_beta extends RDM
             $tmpSQL .= ' OR (pokemon_id = 129 AND weight' . $float . ' > 13.13)';
             $eids[] = "129";
         }
-        global $noDittoDetection, $possibleDitto;
-        if (!$noDittoDetection && ($key = array_search("132", $eids)) === false) {
-            $pDitto = implode(",", $possibleDitto);
-            $tmpSQL .= " OR (weather > 0 AND (level < 6 OR atk_iv < 4 OR def_iv < 4 OR sta_iv < 4) and pokemon_id in (" . $pDitto . "))";
-            $eids[] = "132";
-        }
         if (count($eids)) {
             $pkmn_in = '';
             $i = 1;
@@ -121,11 +115,6 @@ class RDM_beta extends RDM
             if (!empty($bigKarp) && $bigKarp === 'true' && ($key = array_search("129", $ids)) !== false) {
                 $tmpSQL .= ' OR (pokemon_id = 129 AND weight' . $float . ' > 13.13)';
                 unset($ids[$key]);
-            }
-            global $noDittoDetection, $possibleDitto;
-            if (!$noDittoDetection && ($key = array_search("132", $ids)) !== false) {
-                $pDitto = implode(",", $possibleDitto);
-                $tmpSQL .= " OR (weather > 0 AND (level < 6 OR atk_iv < 4 OR def_iv < 4 OR sta_iv < 4) and pokemon_id in (" . $pDitto . "))";
             }
             $pkmn_in = '';
             $i = 1;
@@ -213,12 +202,7 @@ class RDM_beta extends RDM
                 foreach ($forms as $f => $v) {
                     if ($pokemon["form"] === $v['protoform']) {
                         $types = $v['formtypes'];
-                        foreach ($v['formtypes'] as $ft => $v) {
-                            $types[$ft]['type'] = $v['type'];
-                        }
-                        $pokemon["pokemon_types"] = $types;
-                    } elseif ($pokemon["form"] === $v['assetsform']) {
-                        $types = $v['formtypes'];
+                        $pokemon["form_name"] = $v['nameform'];
                         foreach ($v['formtypes'] as $ft => $v) {
                             $types[$ft]['type'] = $v['type'];
                         }
@@ -231,26 +215,6 @@ class RDM_beta extends RDM
                     $types[$k]['type'] = $v['type'];
                 }
                 $pokemon["pokemon_types"] = $types;
-            }
-
-            // Ditto detection
-            global $noDittoDetection, $possibleDitto;
-            if (!$noDittoDetection) {
-                if (in_array($pokemon["pokemon_id"], $possibleDitto) && $pokemon["weather_boosted_condition"] > 0 && $pokemon["level"] !== null) {
-                    if ($pokemon["level"] < 6 || $pokemon["individual_attack"] < 4 || $pokemon["individual_defense"] < 4 || $pokemon["individual_stamina"] < 4) {
-                        if ($pokemon["weather_boosted_condition"] != 3) {
-                            $pokemon["weather_boosted_condition"] = 0;
-                        }
-                        $pokemon["pokemon_id"] = 132;
-                        $pokemon["form"] = 0;
-                        $pokemon["pokemon_name"] = $pokemon["pokemon_name"] . ' (' . i8ln('Ditto') . ')';
-                        $pokemon["move_1"] = 242;
-                        $pokemon["move_2"] = 133;
-                        $pokemon["height"] = null;
-                        $pokemon["weight"] = null;
-                        $pokemon["gender"] = 3;
-                    }
-                }
             }
 
             $data[] = $pokemon;
@@ -510,9 +474,89 @@ class RDM_beta extends RDM
             $spawnpoint["latitude"] = floatval($spawnpoint["latitude"]);
             $spawnpoint["longitude"] = floatval($spawnpoint["longitude"]);
             $spawnpoint["time"] = intval($spawnpoint["despawn_sec"]);
-            $spawnpoint["duration"] = !empty($spawnpoint["duration"]) ? $spawnpoint["duration"] : null;
             $data[] = $spawnpoint;
             unset($spawnpoints[$i]);
+            $i++;
+        }
+        return $data;
+    }
+
+    public function get_weather_by_cell_id($cell_id)
+    {
+        global $db;
+        $query = "SELECT id AS s2_cell_id, gameplay_condition AS gameplay_weather FROM weather WHERE id = :cell_id";
+        $params = [':cell_id' => intval((float)$cell_id)]; // use float to intval because RDM is signed int
+        $weather_info = $db->query($query, $params)->fetchAll(\PDO::FETCH_ASSOC);
+        if ($weather_info) {
+            // force re-bind of gameplay_weather to condition
+            $weather_info[0]['condition'] = $weather_info[0]['gameplay_weather'];
+            unset($weather_info[0]['gameplay_weather']);
+            return $weather_info[0];
+        } else {
+            return null;
+        }
+    }
+
+    public function get_weather($updated = null)
+    {
+        global $db;
+        $query = "SELECT id AS s2_cell_id, gameplay_condition AS gameplay_weather FROM weather";
+        $weathers = $db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+        $data = array();
+        foreach ($weathers as $weather) {
+            $data["weather_" . $weather['s2_cell_id']] = $weather;
+            $data["weather_" . $weather['s2_cell_id']]['condition'] = $data["weather_" . $weather['s2_cell_id']]['gameplay_weather'];
+            unset($data["weather_" . $weather['s2_cell_id']]['gameplay_weather']);
+        }
+        return $data;
+    }
+
+    public function get_scanlocation($swLat, $swLng, $neLat, $neLng, $tstamp = 0, $oSwLat = 0, $oSwLng = 0, $oNeLat = 0, $oNeLng = 0)
+    {
+        $conds = array();
+        $params = array();
+        $conds[] = "last_lat > :swLat AND last_lon > :swLng AND last_lat < :neLat AND last_lon < :neLng";
+        $params[':swLat'] = $swLat;
+        $params[':swLng'] = $swLng;
+        $params[':neLat'] = $neLat;
+        $params[':neLng'] = $neLng;
+        if ($oSwLat != 0) {
+            $conds[] = "NOT (last_lat > :oswLat AND last_lon > :oswLng AND last_lat < :oneLat AND last_lon < :oneLng)";
+            $params[':oswLat'] = $oSwLat;
+            $params[':oswLng'] = $oSwLng;
+            $params[':oneLat'] = $oNeLat;
+            $params[':oneLng'] = $oNeLng;
+        }
+        global $noBoundaries, $boundaries;
+        if (!$noBoundaries) {
+            $conds[] = "(ST_WITHIN(point(last_lat,last_lon),ST_GEOMFROMTEXT('POLYGON(( " . $boundaries . " ))')))";
+        }
+        global $hideDeviceAfterMinutes;
+        if ($hideDeviceAfterMinutes > 0) {
+            $conds[] = "last_seen > UNIX_TIMESTAMP( NOW() - INTERVAL " . $hideDeviceAfterMinutes . " MINUTE)";
+        }
+        return $this->query_scanlocation($conds, $params);
+    }
+
+    private function query_scanlocation($conds, $params)
+    {
+        global $db;
+        $query = "SELECT last_lat AS latitude,
+        last_lon AS longitude,
+        last_seen,
+        uuid,
+        instance_name
+        FROM device
+        WHERE :conditions";
+        $query = str_replace(":conditions", join(" AND ", $conds), $query);
+        $scanlocations = $db->query($query, $params)->fetchAll(\PDO::FETCH_ASSOC);
+        $data = array();
+        $i = 0;
+        foreach ($scanlocations as $scanlocation) {
+            $scanlocation["latitude"] = floatval($scanlocation["latitude"]);
+            $scanlocation["longitude"] = floatval($scanlocation["longitude"]);
+            $data[] = $scanlocation;
+            unset($scanlocations[$i]);
             $i++;
         }
         return $data;
