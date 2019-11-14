@@ -392,6 +392,7 @@ function initMap() { // eslint-disable-line no-unused-vars
     map.addLayer(markers)
     markersnotify = L.layerGroup().addTo(map)
     map.on('zoom', function () {
+        updateS2Overlay()
         if (storeZoom === true) {
             Store.set('zoomLevel', map.getZoom())
         } else {
@@ -447,6 +448,7 @@ function initMap() { // eslint-disable-line no-unused-vars
 
     map.on('click', function (e) {
         if ($('.submit-on-off-button').hasClass('on')) {
+            updateS2Overlay()
             $('.submitLatitude').val(e.latlng.lat)
             $('.submitLongitude').val(e.latlng.lng)
             $('.ui-dialog').remove()
@@ -737,7 +739,7 @@ function showS2Cells(level, style) {
                         totalCount++
                     } else {
                         sponsoredGymCount++
-                    }                    
+                    }
                 }
             })
             $.each(mapData.pois, function (key, item) {
@@ -789,7 +791,7 @@ function showS2Cells(level, style) {
                 '<div>' + i8ln('Pokéstops in cell') + ': <b>' + stopCount + '</b></div>'
             if (sponsoredStopCount > 0) {
                 html += '<div>' + i8ln('Sponsored Pokéstops in cell') + ': <b>' + sponsoredStopCount + '</b></div>'
-            }            
+            }
             if (sponsoredGymCount > 0) {
                 html += '<div>' + i8ln('Sponsored Gyms in cell') + ': <b>' + sponsoredGymCount + '</b></div>'
             }
@@ -817,7 +819,9 @@ function showS2Cells(level, style) {
                 }
                 html += '<div>' + i8ln('Total POI') + ': <b>' + totalPoiCount + '</b></div>'
             }
-            poly.bindPopup(html, {autoPan: false, closeOnClick: false, autoClose: false})
+            if (!$('.submit-on-off-button').hasClass('on')) {
+                poly.bindPopup(html, {autoPan: false, closeOnClick: false, autoClose: false})
+            }
         }
         if (cell.level === 13) {
             exLayerGroup.addLayer(poly)
@@ -1641,7 +1645,9 @@ function pokestopLabel(item) {
             if (item['grunt_type_name'] !== '') {
                 str += '<div>' + i8ln('Grunt-Type') + ': <b>' + item['grunt_type_name'] + '</b></div>'
             }
-            str += '<div>' + i8ln('Grunt-Gender') + ': <b>' + item['grunt_type_gender'] + '</b></div>'
+            if (item['grunt_type_gender'] !== '') {
+                str += '<div>' + i8ln('Grunt-Gender') + ': <b>' + item['grunt_type_gender'] + '</b></div>'
+            }
         }
         incidentEndStr = getTimeStr(item['incident_expiration'])
         str += '<div>' + i8ln('Expiration Time') + ': <b>' + incidentEndStr +
@@ -2449,7 +2455,7 @@ function communityLabel(item) {
         '<center><h4><div>' + item.title + '</div></h4></center>' +
         '<center><div>' + item.description.slice(0, 40) + '</div></center>'
     if (item.team_instinct === 1 || item.team_mystic === 1 || item.team_valor === 1) {
-        str += '<center><div>Welcome to Teams:<br>'
+        str += '<center><div>' + i8ln('Welcome to Teams') + ':<br>'
         if (item.team_instinct === 1) {
             str +=
             '<img src="static/images/communities/instinct.png" align"middle" style="width:18px;height: auto;"/>'
@@ -2483,7 +2489,7 @@ function communityLabel(item) {
         '</div></center>'
     }
     if (item.source === 2) {
-        str += '<center><div style="margin-bottom:5px; margin-top:5px;">' + i8ln('Join on  <a href="https://thesilphroad.com/map#18/' + item.lat + '/' + item.lon + '">thesilphroad.com</a>') + '</div></center>'
+        str += '<center><div style="margin-bottom:5px; margin-top:5px;">' + i8ln('Join on') + '<a href="https://thesilphroad.com/map#18/' + item.lat + '/' + item.lon + '">thesilphroad.com</a>' + '</div></center>'
     }
     if (!noDeleteCommunity) {
         str += '<i class="fas fa-trash-alt delete-community" onclick="deleteCommunity(event);" data-id="' + item.community_id + '"></i>'
