@@ -163,6 +163,42 @@ class RDM extends Search
         return $data;
     }
 
+    public function search_pois($lat, $lon, $term)
+    {
+        global $manualdb, $defaultUnit, $maxSearchResults, $noBoundaries, $boundaries;
+
+        if (!$noBoundaries) {
+            $coords = " AND (ST_WITHIN(point(lat,lon),ST_GEOMFROMTEXT('POLYGON(( " . $boundaries . " ))'))) ";
+        } else {
+            $coords = "";
+        }
+
+        if ($manualdb->info()['driver'] === 'pgsql') {
+            $query = "SELECT id,poi_id,name,lat,lon,poiimageurl, 
+            ROUND(cast( 3959 * acos( cos( radians(:lat) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(:lon) ) + sin( radians(:lat) ) * sin( radians( lat ) ) ) as numeric),2) AS distance 
+            FROM poi WHERE LOWER(name) LIKE :name " . $coords . "ORDER BY distance LIMIT " . $maxSearchResults . "";
+        } else {
+            $query = "SELECT id,name,lat,lon,poiimageurl, 
+            ROUND(( 3959 * acos( cos( radians(:lat) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(:lon) ) + sin( radians(:lat) ) * sin( radians( lat ) ) ) ),2) AS distance 
+            FROM poi WHERE LOWER(name) LIKE :name " . $coords . "ORDER BY distance LIMIT " . $maxSearchResults . "";
+        }
+        $searches = $manualdb->query($query, [ ':name' => "%" . strtolower($term) . "%",  ':lat' => $lat, ':lon' => $lon ])->fetchAll();
+
+        $data = array();
+        $i = 0;
+
+        foreach ($searches as $search) {
+            $search['poiimageurl'] = preg_replace("/^http:/i", "https:", $search['poiimageurl']);
+            if ($defaultUnit === "km") {
+                $search['distance'] = round($search['distance'] * 1.60934, 2);
+            }
+            $data[] = $search;
+            unset($searches[$i]);
+            $i++;
+        }
+        return $data;
+    }    
+
     public function search($dbname, $lat, $lon, $term)
     {
         global $db, $defaultUnit, $maxSearchResults, $noBoundaries, $boundaries;

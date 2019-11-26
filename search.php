@@ -58,5 +58,8 @@ if ($action === "pokestops") {
 if ($action === "forts") {
     $data["forts"] = $search->search($dbname, $lat, $lon, $term);
 }
+if ($action === "pois") {
+    $data["pois"] = $search->search_poi($lat, $lon, $term);
+}
 $jaysson = json_encode($data);
 echo $jaysson;

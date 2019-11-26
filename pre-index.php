@@ -1804,7 +1804,8 @@ if (strtolower($map) === "rdm") {
             <div class="search-modal" style="display:none;">
                 <div id="search-tabs">
                     <ul>
-                        <?php if (! $noQuests && ! $noSearchManualQuests) { ?>
+                        <?php
+                        if (! $noQuests && ! $noSearchManualQuests) { ?>
                             <li><a href="#tab-rewards"><img src="static/images/reward.png"/></a></li>
                         <?php }
                         if (! $noSearchNests) { ?>
@@ -1818,7 +1819,11 @@ if (strtolower($map) === "rdm") {
                         <?php }
                         if (! $noSearchPortals) { ?>
                             <li><a href="#tab-portals"><img src="static/images/portal.png"/></a></li>
-            <?php } ?>
+                        <?php }
+                        if (! $noSearchPortals) { ?>
+                            <li><a href="#tab-poi"><img src="static/images/portal.png"/></a></li>                            
+                        <?php }
+                        ?>
                     </ul>
                     <?php if (! $noQuests && ! $noSearchManualQuests) { ?>
                         <div id="tab-rewards">
@@ -1860,6 +1865,14 @@ if (strtolower($map) === "rdm") {
                             <ul id="portals-search-results" class="search-results portals-results"></ul>
                         </div>
             <?php } ?>
+            <?php if (! $noSearchPortals) { ?>
+                        <div id="tab-poi">
+                            <input type="search" id="poi-search" name="poi-search"
+                                   placeholder="<?php echo i8ln('Enter POI Name'); ?>" data-type="pois"
+                                   class="search-input"/>
+                            <ul id="poi-search-results" class="search-results portals-results"></ul>
+                        </div>
+            <?php } ?>            
                 </div>
             </div>
         </div>
