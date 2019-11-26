@@ -66,7 +66,7 @@ $mBoxKey = "";
 /* How to use multiple Map Box Keys: */
 
 //$dayOfTheWeek = date('l');
-//If ($dayOfTheWeek === 'Monday' || $dayOfTheWeek === 'Tuesday' || $dayOfTheWeek === 'Wednesday') {
+//if ($dayOfTheWeek === 'Monday' || $dayOfTheWeek === 'Tuesday' || $dayOfTheWeek === 'Wednesday') {
 //    $mBoxKey = "";
 //} else if ($dayOfTheWeek === 'Thursday' || $dayOfTheWeek === 'Friday') {
 //    $mBoxKey = "";
@@ -124,8 +124,8 @@ $numberOfGrunt = 50;
 //-----------------------------------------------------
 // Login
 //-----------------------------------------------------
+$forcedLogin = false;                                               // Force users to login before they can see map
 /* Discord Auth */
-$forcedDiscordLogin = false;                                        // Force users to login with discord before they can see map
 $noDiscordLogin = true;                                             // This will enable login through discord.
                                                                     // 1. Create a discord bot here -> https://discordapp.com/developers/applications/me
                                                                     // 2. Install composer with "apt-get install composer".
@@ -227,7 +227,7 @@ $enableTeamRocketTimer = 'false';
 $noTeamRocketEncounterData = true; // Show/Hide possible rewards. Requires grunttype.json to be up to date.
 $noGrunts = false;
 $noGruntNumbers = false;
-$hideGrunts = [];
+$hideGrunts = '[]';
 $excludeGrunts = [];
 $generateExcludeGrunts = true;
 
@@ -458,20 +458,7 @@ $excludeNestMons = [2,3,5,6,8,9,11,12,14,15,17,18,20,22,24,26,28,29,30,31,32,33,
 $noNestPolygon = true;
 $enableNestPolygon = 'false';
 $nestGeoJSONfile = 'custom/nest.json';			    // path to geoJSON file provided by https://github.com/M4d40/PMSFnestScript
-//-----------------------------------------------
-// HPWU
-//-----------------------------------------------------
-$noInn = true;               // Enable/Disable the option to see inns
-$enableInn = 'false';        // Enable/Disable inns by default. A user can edit this.
-$noDeleteInn = true;         // Enable/Disable option do delete a inn
 
-$noFortress = true;          // Enable/Disable the option to see fortresses
-$enableFortress = 'false';   // Enable/Disable fortresses by default. A user can edit this
-$noDeleteFortress = true;    // Enable/Disable option do delete a fortress
-
-$noGreenhouse = true;        // Enable/Disable the option to see greenhouses
-$enableGreenhouse = 'false'; // Enable/Disable greenhouses by default. A user can edit this
-$noDeleteGreenhouse = true;  // Enable/Disable option do delete a greenhouse
 //-----------------------------------------------------
 // Areas
 //-----------------------------------------------------
