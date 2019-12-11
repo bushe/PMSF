@@ -156,6 +156,7 @@ var pokemonTypes = [i8ln('unset'), i8ln('Normal'), i8ln('Fighting'), i8ln('Flyin
 var genderType = ['♂', '♀', '⚲']
 var cpMultiplier = [0.094, 0.16639787, 0.21573247, 0.25572005, 0.29024988, 0.3210876, 0.34921268, 0.37523559, 0.39956728, 0.42250001, 0.44310755, 0.46279839, 0.48168495, 0.49985844, 0.51739395, 0.53435433, 0.55079269, 0.56675452, 0.58227891, 0.59740001, 0.61215729, 0.62656713, 0.64065295, 0.65443563, 0.667934, 0.68116492, 0.69414365, 0.70688421, 0.71939909, 0.7317, 0.73776948, 0.74378943, 0.74976104, 0.75568551, 0.76156384, 0.76739717, 0.7731865, 0.77893275, 0.7846369, 0.79030001]
 var throwType = JSON.parse('{"10": "Nice", "11": "Great", "12": "Excellent"}')
+var gruntCharacterTypes = [i8ln('unset'), i8ln('Team Leader'), i8ln('Grunt(s)'), i8ln('Arlo'), i8ln('Cliff'), i8ln('Sierra'), i8ln('Giovanni')]
 var weatherLayerGroup = new L.LayerGroup()
 var weatherArray = []
 var weatherPolys = []
@@ -253,6 +254,9 @@ if (copyrightSafe) {
     Store.set('icons', 'static/icons-safe/')
 } else if (Store.get('icons') === 'static/icons-safe/' || Store.get('icons') === '') {
     Store.set('icons', icons)
+}
+if (forcedTileServer) {
+    Store.set('map_style', 'tileserver')
 }
 function previewPoiImage(event) { // eslint-disable-line no-unused-vars
     var form = $(event.target).parent().parent()
@@ -422,7 +426,7 @@ function initMap() { // eslint-disable-line no-unused-vars
     })
 
     map.createPane('portals')
-    map.getPane('portals').style.zIndex = 300
+    map.getPane('portals').style.zIndex = 400
     createMyLocationButton()
     initSidebar()
 
@@ -691,15 +695,15 @@ function createLocationMarker() {
 function cellLabel(stopCount, sponsoredStopCount, sponsoredGymCount, gymCount, totalCount, possibleCandidatePoiCount, submittedPoiCount, declinedPoiCount, resubmittedPoiCount, notEligiblePoiCount, totalPoiCount) {
     var html = ''
     var count = ''
-    if (totalCount >= 20) {
+    if (totalCount >= 20 && gymCount >= 3) {
         html += '<div><center><b>' + i8ln('Max amount of Gyms reached') + '</b></center></div>'
-    } else if (totalCount >= 6) {
+    } else if (totalCount >= 6 && gymCount === 2) {
         count = 20 - totalCount
         html += '<div><center><b>' + count + ' ' + i8ln('more Pokéstop(s) until new gym') + '</b></center></div>'
-    } else if (totalCount >= 2) {
+    } else if (totalCount >= 2 && gymCount === 1) {
         count = 6 - totalCount
         html += '<div><center><b>' + count + ' ' + i8ln('more Pokéstop(s) until new gym') + '</b></center></div>'
-    } else if (totalCount < 2) {
+    } else if (totalCount < 2 && gymCount === 0) {
         count = 2 - totalCount
         html += '<div><center><b>' + count + ' ' + i8ln('more Pokéstop(s) until new gym') + '</b></center></div>'
     }
@@ -805,6 +809,8 @@ function showS2Cells(level, style) {
                     }
                 }
             })
+        }
+        if (cell.level === 14 && Store.get('showPoi')) {
             $.each(mapData.pois, function (key, item) {
                 if (pointInPolygon(item['lat'], item['lon'], s2Lats, s2Lons)) {
                     if (item['status'] === '1') {
@@ -824,12 +830,12 @@ function showS2Cells(level, style) {
         }
 
         var filledStyle = {color: 'black', fillOpacity: 0.0}
-        if (cell.level === 14) {
-            if ((cell.level === 14) && (totalCount === 1 || totalCount === 5 || totalCount === 19)) {
+        if (cell.level === 14 && Store.get('showPokestops') && Store.get('showGyms')) {
+            if ((totalCount === 1 && gymCount === 0) || (totalCount === 5 && gymCount === 1) || (totalCount === 19 && gymCount === 2)) {
                 filledStyle = {fillColor: s2Colors[1], fillOpacity: 0.3}
-            } else if ((cell.level === 14) && (totalCount === 4 || totalCount === 18)) {
+            } else if ((totalCount === 4 && gymCount === 1) || (totalCount === 18 && gymCount === 2)) {
                 filledStyle = {fillColor: s2Colors[2], fillOpacity: 0.3}
-            } else if (cell.level === 14 && totalCount >= 20) {
+            } else if (totalCount >= 20 && gymCount >= 3) {
                 filledStyle = {fillColor: s2Colors[3], fillOpacity: 0.3}
             }
         } else if (cell.level === 17) {
@@ -845,9 +851,20 @@ function showS2Cells(level, style) {
             })
         }
 
-        const poly = L.polygon(vertices, Object.assign({color: 'black', opacity: 0.5, weight: 0.5, fillOpacity: 0.0}, style, filledStyle))
-        if (cell.level === 14 && !$('.submit-on-off-button').hasClass('on')) {
-            poly.bindPopup(cellLabel(stopCount, sponsoredStopCount, sponsoredGymCount, gymCount, totalCount, possibleCandidatePoiCount, submittedPoiCount, declinedPoiCount, resubmittedPoiCount, notEligiblePoiCount, totalPoiCount), {autoPan: false, closeOnClick: false, autoClose: false})
+        const poly = L.polygon(vertices, Object.assign({
+            pane: 'portals',
+            color: 'black',
+            opacity: 0.5,
+            weight: 0.5,
+            fillOpacity: 0.0
+        }, style, filledStyle))
+
+        if (cell.level === 14 && Store.get('showPokestops') && Store.get('showGyms') && !$('.submit-on-off-button').hasClass('on')) {
+            poly.bindPopup(cellLabel(stopCount, sponsoredStopCount, sponsoredGymCount, gymCount, totalCount, possibleCandidatePoiCount, submittedPoiCount, declinedPoiCount, resubmittedPoiCount, notEligiblePoiCount, totalPoiCount), {
+                autoPan: false,
+                closeOnClick: false,
+                autoClose: false
+            })
         }
 
         if (cell.level === 13) {
@@ -906,7 +923,7 @@ function buildScanPolygons() {
 }
 
 function buildNestPolygons() {
-    if (!Store.get(['showNestPolygon']) || !enableNestPolygon) {
+    if (!Store.get(['showNestPolygon'])) {
         return false
     }
 
@@ -1210,7 +1227,7 @@ function pokemonLabel(item) {
     contentstring +=
     '<a href="javascript:void(0)" onclick="javascript:openMapDirections(' + latitude + ', ' + longitude + ')" title="' + i8ln('View in Maps') + '">' +
     '<i class="fas fa-road"></i> ' + coordText + '</a> - ' +
-    '<a href="./?lat=' + latitude + '&lon=' + longitude + '&zoom=16">' +
+    '<a href="./?encId=' + encounterId + '">' +
     '<i class="far fa-share-square" aria-hidden="true" style="position:relative;top:3px;left:0px;color:#26c300;margin-bottom:10px;font-size:18px;"></i>' +
     '</a></center></div>'
     if (atk != null && def != null && sta != null) {
@@ -1537,6 +1554,23 @@ function getQuest(item) {
                     break
                 case 25:
                     str = str.replace('{0} pokémon', 'pokémon caught ' + questinfo['distance'] + 'km apart')
+                    break
+                case 27:
+                    var gstr = ''
+                    if (questinfo['character_category_ids'].length > 1) {
+                        $.each(questinfo['character_category_ids'], function (index, charId) {
+                            if (index === (questinfo['character_category_ids'].length - 2)) {
+                                gstr += gruntCharacterTypes[charId] + ' or '
+                            } else if (index === (questinfo['character_category_ids'].length - 1)) {
+                                gstr += gruntCharacterTypes[charId]
+                            } else {
+                                gstr += gruntCharacterTypes[charId] + ', '
+                            }
+                        })
+                    } else {
+                        gstr += questinfo['character_category_ids']
+                    }
+                    str = str.replace('Team GO Rocket Grunt(s)', gstr)
                     break
             }
         } else if (item['quest_type'] > 0) {

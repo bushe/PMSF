@@ -58,6 +58,11 @@ $headerTitle = "POGOmap";                                           // Title to 
 $locale = "en";                                                     // Display language
 $raidmapLogo = '';                                                  // Upload logo to custom folder, leave '' for empty ( $raidmapLogo = 'custom/logo.png'; )
 
+/* Loading screen */
+
+$noLoadingScreen = false;                                           // show loading animation while main page loads.
+$loadingStyle = '';                                                 // Leave blank for default loading icon. Use $loadingStyle = '<img src="static/images/pokeball2.gif" style="height:40px;">';
+                                                                    // for pokeball or custom gif for animated gif; or use your own html.
 /* Google Maps and MapBox are ONLY USED FOR TILE LAYERS */
 
 $gmapsKey = "";
@@ -78,6 +83,7 @@ $mBoxKey = "";
 
 $noCustomTileServer = true;                                         // Enable/Disable Custom TileServer
 $customTileServerAddress = "";                                      // TileServer URL: http://ipAddress:port/tile/klokantech-basic/{z}/{x}/{y}/1/png
+$forcedTileServer = false;
 
 /* Google Analytics */
 
@@ -125,6 +131,8 @@ $numberOfGrunt = 50;
 // Login
 //-----------------------------------------------------
 $forcedLogin = false;                                               // Force users to login before they can see map
+$adminUsers = ['admin@example.com', 'admin2@example.com'];          // You can add multiple admins by adding them to the array.
+$manualAccessLevel = false;
 /* Discord Auth */
 $noDiscordLogin = true;                                             // This will enable login through discord.
                                                                     // 1. Create a discord bot here -> https://discordapp.com/developers/applications/me
@@ -145,14 +153,6 @@ $logFailedLogin = 'logs/failed_login.log';                          // File loca
 /* Native Auth */
 $noNativeLogin = true;                                              // This will enable the built in login system.
 $domainName = '';                                                   // If this is empty, reset-password emails will use the domain name taken from the URL.
-
-$noSelly = true;                                                    // Enable/Disable Selly Payment system. (WIP, USE AT OWN RISK!)
-$logfile = 'logs/members.log';                                      // Path to log file. Make sure this works as it will be your life saver if your db crashes.
-$daysMembershipPerQuantity = 31;                                    // How many days membership one selly quantity will give.
-$sellyPage = '';                                                    // Link to selly purchase page for membership renewal.
-$sellyWebhookSecret = '';                                           // Add a secret key at https://selly.gg/settings to make sure the payment webhook is sent from selly to prevent fake payments.
-                                                                    // Add the same key to the $sellyWebhookSecret variable.
-$adminUsers = ['admin@example.com', 'admin2@example.com'];          // You can add multiple admins by adding them to the array.
 //-----------------------------------------------------
 // FRONTEND SETTINGS
 //-----------------------------------------------------
@@ -265,6 +265,8 @@ $noLiveScanLocation = true;                                         // Show scan
 $enableLiveScan = 'false';
 $hideDeviceAfterMinutes = 0;                                        // Hide scan devices from map after x amount of minutes not being updated in database. 0 to disable.
 $deviceOfflineAfterSeconds = 300;                                   // Mark scan devices offline (red color) after x amount of seconds not being updated in database.
+
+$hideDeleted = true;						// Hide deleted Pokestop / Gyms from map
 /* Location & Search Settings */
 
 $noSearchLocation = false;
