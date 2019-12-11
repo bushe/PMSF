@@ -7,8 +7,7 @@ include('config/config.php');
 <head>
     <meta charset="utf-8">
     <title><?= $title ?></title>
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="PokeMap">
@@ -46,6 +45,9 @@ include('config/config.php');
         var token = '<?php echo (!empty($_SESSION['token'])) ? $_SESSION['token'] : ""; ?>';
     </script>
     <link rel="stylesheet" href="static/dist/css/app.min.css">
+    <?php if (file_exists('static/css/custom.css')) {
+        echo '<link rel="stylesheet" href="static/css/custom.css?' . time() . '">';
+    } ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
     <script src="static/js/vendor/modernizr.custom.js"></script>
@@ -61,6 +63,8 @@ include('config/config.php');
         }
         if ($noNativeLogin === true && $noDiscordLogin === false && empty($_SESSION['user']->id)) {
             header("Location: ./discord-login");
+        } elseif ($noNativeLogin === true && $noDiscordLogin === false && !empty($_SESSION['user']->id) && !in_array(isset($_SESSION['user']->user) ? $_SESSION['user']->user : null, $adminUsers)) {
+            header("Location: .?login=true");
         }
 
         if (isset($_POST['submitUpdatePwdBtn'])) {
@@ -116,7 +120,7 @@ include('config/config.php');
                         ]);
                     }
                 }
-                header("Location: .");
+                header("Location: .?login=true");
                 die();
             }
         }
@@ -145,10 +149,7 @@ include('config/config.php');
                 $message .= i8ln('Thank you for signing up.') . "<br>";
                 $message .= i8ln('Your temporary password is ') . " {$randomPwd}<br><br>";
             }
-            
-            if ($sellyPage) {
-                $message .= i8ln('You can purchase membership on ') . "<a href='{$sellyPage}'>selly</a>.<br><br>";
-            }
+
             if ($discordUrl) {
                 $message .= i8ln('For support, ask your questions in the ') . "<a href='{$discordUrl}'>" . i8ln('discord guild') . "</a>!<br><br>";
             }
@@ -160,14 +161,14 @@ include('config/config.php');
             !empty($domainName) ? $domainName = $domainName : $domainName = $_SERVER['SERVER_NAME'];
             $headers = "From: no-reply@{$domainName}" . "\r\n" .
                 "Reply-To: no-reply@{$domainName}" . "\r\n" .
-                'Content-Type: text/html; charset=ISO-8859-1' . "\r\n" .
+                'Content-Type: text/html; charset=utf-8' . "\r\n" .
                 'X-Mailer: PHP/' . phpversion();
 
             $sendMail = mail($_POST['email'], $subject, $message, $headers);
 
             if (!$sendMail) {
                 http_response_code(500);
-                die("<h1>Warning</h1><p>The email has not been sent.<br>If you're an user please contact your administrator.<br>If you're an administrator install <i><b>apt-get install sendmail</b></i> and restart your web server and try again.</p><p><a href='.'>Back to Map</a> - <a href='./user?forgotPwd'>Retry</a></p>");
+                die("<h1>Warning</h1><p>The email has not been sent.<br>If you're an user please contact your administrator.<br>If you're an administrator install <i><b>apt-get install sendmail</b></i> and restart your web server and try again.</p><p><a href='.'><i class='fas fa-backward'></i> Back to Map</a> - <a href='./user?forgotPwd'>Retry</a></p>");
             }
             
             header("Location: ?sentPwd");
@@ -176,7 +177,7 @@ include('config/config.php');
         if (isset($_POST['submitUpdateUserBtn'])) {
             $Err = '';
             if ($_POST['email'] !== '-1' || !empty($_POST['createUserEmail'])) {
-                if ((isset($_POST['ResetPwd']) || $_POST['radioExpireDate'] > 0) && $_POST['email'] !== '-1') {
+                if ((isset($_POST['ResetPwd']) || $_POST['radioExpireDate'] > 0 || $_POST['radioAccessLevel'] !== 'none') && $_POST['email'] !== '-1') {
                     if (strpos($_POST['email'], '#')) {
                         $login_system = 'discord';
                     } else {
@@ -198,15 +199,19 @@ include('config/config.php');
                     if ($_POST['radioExpireDate'] > 0) {
                         if ($_POST['radioExpireDate'] >= 1 && $_POST['radioExpireDate'] <= 12) {
                             if ($info['expire_timestamp'] > time()) {
-                                $newExpireTimestamp = $info['expire_timestamp'] + 60 * 60 * 24 * $daysMembershipPerQuantity * $_POST['radioExpireDate'];
+                                $newExpireTimestamp = $info['expire_timestamp'] + 60 * 60 * 24 * 31 * $_POST['radioExpireDate'];
                             } else {
-                                $newExpireTimestamp = time() + 60 * 60 * 24 * $daysMembershipPerQuantity;
+                                $newExpireTimestamp = time() + 60 * 60 * 24 * 31 * $_POST['radioExpireDate'];
                             }
                         } else {
                             $newExpireTimestamp = strtotime($_POST['customDate']);
                         }
-
                         updateExpireTimestamp($_POST['email'], $login_system, $newExpireTimestamp);
+                    }
+
+                    if ($_POST['radioAccessLevel'] !== 'none') {
+                        $newAccessLevel = $_POST['radioAccessLevel'];
+                        updateAccessLevel($_POST['email'], $login_system, $newAccessLevel);
                     }
                 } else {
                     $Err = i8ln('No changes made.');
@@ -226,20 +231,6 @@ include('config/config.php');
                 $Err = i8ln('No changes made.');
             }
         }
-        if (isset($_POST['submitKey'])) {
-            $Err = '';
-            $info = $manualdb->query(
-                "SELECT selly_id, activated, quantity FROM payments WHERE selly_id = :selly_id", [
-                    ":selly_id" => $_POST['key']
-                ]
-            )->fetch();
-
-            if (empty($info['selly_id'])) {
-                $Err = i8ln('Invalid key.');
-            } elseif ($info['activated'] === 1) {
-                $Err = i8ln('This key has already been activated.');
-            }
-        }
 
         if (isset($_GET['account'])) {
             ?>
@@ -250,7 +241,7 @@ include('config/config.php');
                         <th><?php echo i8ln('E-mail'); ?></th><td><input type="text" name="email" required></td>
                     </tr>
                 </table>
-                <table><tr><td><input id="margin" type="submit" name="submitCreateUserOrResetPasswordBtn" value="<?php echo i8ln('Submit'); ?>"><a class='button' href='/user'><?php echo i8ln('Back'); ?></a></td></tr></table>
+                <table><tr><td><input class="button" id="margin" type="submit" name="submitCreateUserOrResetPasswordBtn" value="<?php echo i8ln('Submit'); ?>"><a class='button' href='/user'><i class='fas fa-backward'></i> <?php echo i8ln('Back'); ?></a></td></tr></table>
             </form>
         <?php
         } elseif (!empty($_SESSION['user']->updatePwd)) {
@@ -274,21 +265,12 @@ include('config/config.php');
                     <?php
                     } ?>
                 </table>
-                <table><tr><td><input id="margin" type="submit" name="submitUpdatePwdBtn" value="<?php echo i8ln('Submit'); ?>"><a class='button' href='./logout.php'><?php echo i8ln('Logout'); ?></a></td></tr></table>
+                <table><tr><td><input class="button" id="margin" type="submit" name="submitUpdatePwdBtn" value="<?php echo i8ln('Submit'); ?>"><a class='button' href='./logout.php'><?php echo i8ln('Logout'); ?></a></td></tr></table>
             </form>
         <?php
         } elseif (in_array(isset($_SESSION['user']->user) ? $_SESSION['user']->user : null, $adminUsers)) {
             ?>
             <h2><?php echo "[<a href='.'>{$title}</a>] - " . i8ln('Admin page'); ?></h2>
-            <?php
-            if (!file_exists($logfile)) {
-                if (file_put_contents($logfile, "-- " . i8ln('This is a test to make sure logging is okay.') . " " . date('Y-m-d H:i:s') ."\r\n", FILE_APPEND) == false) {
-                    echo "<h1>" . i8ln('Warning') . "</h1>" .
-                        "<p>" . i8ln('Your backup logging doesn\'t work. In case of database corruption all data may be lost.') .
-                        "<br>" . i8ln('To solve this, type') .
-                        ":<br><i><b>sudo chgrp " . exec('whoami') . " " . dirname(__DIR__) . "<br>sudo chmod g+w " . dirname(__DIR__) . "</b></i></p>";
-                }
-            } ?>
             <form action='' method='POST'>
                 <table style='margin: 0;'>
                     <tr>
@@ -313,6 +295,24 @@ include('config/config.php');
                             </select>
                         </td>
                     </tr>
+
+                    <tr>
+                        <th><?php echo i8ln('Access Level'); ?></th>
+                        <td>
+                            <label><input type="radio" name="radioAccessLevel" value="none" checked="checked"><?php echo i8ln('No change'); ?></label>
+                            <label><input type="radio" name="radioAccessLevel" value="0">0</label>
+                            <label><input type="radio" name="radioAccessLevel" value="1">1</label>
+                            <label><input type="radio" name="radioAccessLevel" value="2">2</label>
+                            <label><input type="radio" name="radioAccessLevel" value="3">3</label>
+                            <label><input type="radio" name="radioAccessLevel" value="4">4</label>
+                            <label><input type="radio" name="radioAccessLevel" value="5">5</label>
+                            <label><input type="radio" name="radioAccessLevel" value="6">6</label>
+                            <label><input type="radio" name="radioAccessLevel" value="7">7</label>
+                            <label><input type="radio" name="radioAccessLevel" value="8">8</label>
+                            <label><input type="radio" name="radioAccessLevel" value="9">9</label>
+                        </td>
+                    </tr>
+
                     <tr>
                         <th><?php echo i8ln('Expire Date'); ?></th>
                         <td>
@@ -325,14 +325,20 @@ include('config/config.php');
                             <input class="date" type="date" name="customDate" id="customDate" value="<?php echo date('Y-m-d', time()); ?>" disabled="disabled">
                         </td>
                     </tr>
+
                     <tr>
                         <th><?php echo i8ln('Reset Password'); ?></th><td><input type="checkbox" name="ResetPwd"></td>
                     </tr>
+
                     <tr>
                         <th><?php echo i8ln('Create User'); ?></th><td><input type="text" name="createUserEmail" placeholder='<?php echo i8ln('E-mail'); ?>'></td>
                     </tr>
                 </table>
-                <table><tr><td><input id="margin" type="submit" name="submitUpdateUserBtn" value="<?php echo i8ln('Submit'); ?>"></td></tr></table>
+                <table>
+                    <tr><td>
+                        <input class="button" id="margin" type="submit" name="submitUpdateUserBtn" value="<?php echo i8ln('Submit'); ?>">
+                    </td></tr>
+                </table>
             </form>
             
             <?php
@@ -347,6 +353,14 @@ include('config/config.php');
                         <tr>
                             <th id="one-third"><?php echo $_POST['email'] . " - " . i8ln('Expire Date'); ?></th>
                             <td><input type="text" name="infoMess" value="<?php echo date('Y-m-d', $newExpireTimestamp); ?>" id="greenBox" disabled></td>
+                        </tr>
+                        <?php
+                        }
+                        if (isset($_POST['submitUpdateUserBtn']) && $_POST['radioAccessLevel'] !== 'none' && $_POST['email'] !== '-1') {
+                            ?>
+                        <tr>
+                            <th id="one-third"><?php echo $_POST['email'] . " - " . i8ln('Access Level'); ?></th>
+                            <td><input type="text" name="infoMess" value="<?php echo $newAccessLevel; ?>" id="greenBox" disabled></td>
                         </tr>
                         <?php
                         }
@@ -377,46 +391,6 @@ include('config/config.php');
                 </table>
             <?php
             }
-        } elseif (!empty($_SESSION['user']->user)) {
-            ?>
-            <h2><?php echo "[<a href='.'>{$title}</a>] - " . i8ln('Activate key'); ?></h2>
-            <?php
-                if (isset($_POST['submitKey']) && empty($Err)) {
-                    if ($_SESSION['user']->expire_timestamp > time()) {
-                        $newExpireTimestamp = $_SESSION['user']->expire_timestamp + 60 * 60 * 24 * $daysMembershipPerQuantity * $info['quantity'];
-                    } else {
-                        $newExpireTimestamp = time() + 60 * 60 * 24 * $daysMembershipPerQuantity * $info['quantity'];
-                    }
-
-                    $_SESSION['user']->expire_timestamp = $newExpireTimestamp;
-
-                    $manualdb->update("payments", [
-                        "activated" => 1
-                    ], [
-                        "selly_id" => $info['selly_id']
-                    ]);
-
-                    updateExpireTimestamp($_SESSION['user']->user, $_SESSION['user']->login_system, $newExpireTimestamp);
-                    $time = date("Y-m-d H:i", $newExpireTimestamp);
-
-                    echo "<h3><span style='color: green;'>" . i8ln('Your key has been activated!') . "<br>" . i8ln('Your account expires on: ') . $time . "</span></h3>";
-                } elseif (isset($_POST['submitKey']) && !empty($Err)) {
-                    echo "<h3><span style='color: red;'>{$Err}</span></h3>";
-                } ?>
-            <form action='' method='POST'>
-                <table style='margin: 0;'>
-                    <tr>
-                        <th><?php echo i8ln('Selly Order ID'); ?></th><td><input type="text" name="key" required placeholder="123a4b5c-de67-8901-f234-5g6789801h23"></td>
-                    </tr>
-                    <tr>
-                        
-                    </tr>
-                </table>
-                <table><tr><td><input id="margin" type="submit" name="submitKey" value="<?php echo i8ln('Submit'); ?>"><?php if ($sellyPage) {
-                    echo "<a class='button' target='_TAB' id='margin' href='{$sellyPage}'>" . i8ln('Extend Membership') . "</a>";
-                } ?><a class='button' id="margin" href='.'><?php echo i8ln('Back to map'); ?></a></td></tr></table>
-            </form>
-        <?php
         } else {
             ?>
             <p><h2><?php echo "[<a href='.'>{$title}</a>] - " . i8ln('Login'); ?></h2></p>
@@ -447,9 +421,9 @@ include('config/config.php');
                     <?php
                     } ?>
                 </table>
-                <table><tr><td><input id="margin" type="submit" name="submitLoginBtn" value="<?php echo i8ln('Submit'); ?>"><a class='button' id="margin" href='?account'><?php echo i8ln('Create User / Reset Password'); ?></a><?php if ($noDiscordLogin === false) {
-                        echo "<a class='button' id='margin' href='./discord-login'>" . i8ln('Login with Discord') . "</a>";
-                    } ?> <a class='button' id='margin' href='.'><?php echo i8ln('Back to Map'); ?></a></td></tr></table>
+                <table><tr><td><input class="button" id="margin" type="submit" name="submitLoginBtn" value="<?php echo i8ln('Submit'); ?>"><a class='button' id="margin" href='?account'><i class='fas fa-user'></i> <?php echo i8ln('Create User / Reset Password'); ?></a><?php if ($noDiscordLogin === false) {
+                        echo "<a class='button' id='margin' href='./discord-login'><i class='fab fa-discord'></i> " . i8ln('Login with Discord') . "</a>";
+                    } ?> <a class='button' id='margin' href='.'><i class='fas fa-backward'></i>  <?php echo i8ln('Back to Map'); ?></a></td></tr></table>
             </form>
        <?php
         }
