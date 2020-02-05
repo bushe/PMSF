@@ -6,7 +6,7 @@
 
 //======================================================================
 // PMSF - DEFAULT CONFIG FILE
-// https://github.com/whitewillem/PMSF
+// https://github.com/pmsf/PMSF
 //======================================================================
 if (!isset($_SESSION)) {
     session_start();
@@ -50,7 +50,7 @@ $startingLng = 5.302366;                                        // Starting long
 $maxLatLng = 1;                                                     // Max latitude and longitude size (1 = ~110km, 0 to disable)
 $defaultZoom = 16;                                                  // Default zoom level for first time users.
 $maxZoomOut = 0;                                                    // Max zoom out level (11 ~= $maxLatLng = 1, 0 to disable, lower = the further you can zoom out)
-$maxZoomIn = 18;                                                    // Max zoom in level 18
+$maxZoomIn = 18;                                                    // Max zoom in level 18, higher values will be loaded from level 18 and auto-scaled
 $disableClusteringAtZoom = 15;					                    // Disable clustering above this value. 0 to disable
 $zoomToBoundsOnClick = 15;					                        // Zoomlevel on clusterClick
 $maxClusterRadius = 30;						                        // The maximum radius that a cluster will cover from the central marker (in pixels).
@@ -79,7 +79,7 @@ $blockIframe = true;                                                // Block you
 $title = "PMSF Alt";                                                // Title to display in title bar
 $headerTitle = "POGOmap";                                           // Title to display in header
 $locale = "en";                                                     // Display language
-
+$noLocaleSelection = false;
 /* Loading screen */
 
 $noLoadingScreen = false;                                           // show loading animation while main page loads.
@@ -95,6 +95,10 @@ $mBoxKey = "";
 $noCustomTileServer = true;                                         // Enable/Disable Custom TileServer
 $customTileServerAddress = "";                                      // TileServer URL: http://ipAddress:port/tile/klokantech-basic/{z}/{x}/{y}/1/png
 $forcedTileServer = false;
+
+/* Custom Overlay */
+$letItSnow = true;                                                   // Show snow overlay at 24, 25 and 26 December
+$makeItBang = true;                                                  // Show fireworks overlay at 31 December and 1 January
 
 /* Google Analytics */
 
@@ -125,6 +129,7 @@ $noStatsToggle = false;                                             // Enables o
 
 /* MOTD */
 $noMotd = true;
+$showMotdOnlyOnce = false;
 $motdTitle = "";
 $motdContent = "";
 
@@ -138,6 +143,7 @@ $imgurCID = "";
 $numberOfPokemon = 649;
 $numberOfItem = 1405;
 $numberOfGrunt = 50;
+$numberOfEgg = 10;
 //-----------------------------------------------------
 // Login  - You need to create the two tables referenced in sql.sql
 //-----------------------------------------------------
@@ -215,14 +221,27 @@ $enableGyms = 'false';                                              // true/fals
 $hideGymCoords = false;
 $noExEligible = false;                                              // true/false
 $exEligible = 'false';                                              // true/false
+$noTeams = false;
+$noOpenSpot = false;
+$noMinMaxFreeSlots = false;
+$noLastScan = false;
 
 $noRaids = false;                                                   // true/false
 $enableRaids = 'false';                                             // true/false
+$noActiveRaids = true;
 $activeRaids = 'false';                                             // true/false
+$noMinMaxRaidLevel = true;
 $minRaidLevel = 1;
 $maxRaidLevel = 5;
 $noRaidTimer = false;                                               // true/false
 $enableRaidTimer = 'false';                                         // true/false
+$noRaidbossNumbers = false;
+$hideRaidboss = '[]';
+$excludeRaidboss = [];
+$noRaideggNumbers = false;
+$hideRaidegg = '[]';
+$excludeRaidegg = [];
+$generateExcludeRaidboss = true;
 
 $noPokestops = false;                                               // true/false
 $enablePokestops = 'false';                                         // true/false
@@ -255,7 +274,7 @@ $excludeQuestsPokemon = [];  // Pokemon ids
 $hideQuestsItem = '[4, 5, 301, 401, 402, 403, 404, 501, 602, 603, 604, 702, 704, 708, 801, 901, 902, 903, 1001, 1002, 1401, 1402, 1403, 1404, 1405]';    // Item ids "See protos https://github.com/Furtif/POGOProtos/blob/master/src/POGOProtos/Inventory/Item/ItemId.proto"
 $excludeQuestsItem = [4, 5, 301, 401, 402, 403, 404, 501, 602, 603, 604, 702, 704, 708, 801, 901, 902, 903, 1001, 1002, 1401, 1402, 1403, 1404, 1405];
 $noItemNumbers = true;                                             // true/false
-
+$defaultDustAmount = 500;
 // Manual quest hide options
 $hideQuestTypes = [0, 1, 2, 3, 12, 18, 19, 22, 24, 25];
 $hideRewardTypes = [0, 1, 4, 5, 6];
@@ -309,6 +328,7 @@ $notifyBounce = 'true';                                             // true/fals
 $notifyNotification = 'true';                                       // true/false
 
 /* Style Settings */
+$noDarkMode = false;
 
 $copyrightSafe = true;
 $noCostumeIcons = true;                                            // Set to true if you $iconRepository doesnt support costume icons. true/false
