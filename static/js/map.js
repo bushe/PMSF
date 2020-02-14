@@ -452,6 +452,7 @@ function initMap() { // eslint-disable-line no-unused-vars
     buildNestPolygons()
     createSnow()
     createFireworks()
+    createHearts()
 
     map.on('moveend', function () {
         updateS2Overlay()
@@ -1021,6 +1022,80 @@ function createFireworks() {
             '<div class="after"></div>' +
             '</div>'
         $('#map').append(fireworks)
+    }
+}
+
+function createHearts() {
+    if (!showYourLove) {
+        return false
+    }
+    var d = new Date()
+    if (d.getMonth() === 1 && d.getDate() === 14) {
+        const valentine = '<canvas id="valentine-canvas"></canvas>'
+        $('#map').append(valentine)
+        var hearts = {
+            heartHeight: 25,
+            heartWidth: 25,
+            hearts: [],
+            heartImage: 'static/images/misc/heart-0.png',
+            heartImageAlt: 'static/images/misc/heart-1.png',
+            maxHearts: 50,
+            minScale: 0.4,
+            draw: function () {
+                this.setCanvasSize()
+                this.ctx.clearRect(0, 0, this.w, this.h)
+                for (var i = 0; i < this.hearts.length; i++) {
+                    var heart = this.hearts[i]
+                    heart.image = new Image()
+                    heart.image.style.height = heart.height
+                    if (i % 2 === 1) {
+                        heart.image.src = this.heartImageAlt
+                    } else {
+                        heart.image.src = this.heartImage
+                    }
+                    this.ctx.globalAlpha = heart.opacity
+                    this.ctx.drawImage(heart.image, heart.x, heart.y, heart.width, heart.height)
+                }
+                this.move()
+            },
+            move: function () {
+                for (var b = 0; b < this.hearts.length; b++) {
+                    var heart = this.hearts[b]
+                    heart.y += heart.ys
+                    if (heart.y > this.h) {
+                        heart.x = Math.random() * this.w
+                        heart.y = -1 * this.heartHeight
+                    }
+                }
+            },
+            setCanvasSize: function () {
+                this.canvas.width = window.innerWidth
+                this.canvas.height = window.innerHeight
+                this.w = this.canvas.width
+                this.h = this.canvas.height
+            },
+            initialize: function () {
+                this.canvas = $('#valentine-canvas')[0]
+                if (!this.canvas.getContext) {
+                    return
+                }
+                this.setCanvasSize()
+                this.ctx = this.canvas.getContext('2d')
+                for (var a = 0; a < this.maxHearts; a++) {
+                    var scale = (Math.random() * (1 - this.minScale)) + this.minScale
+                    this.hearts.push({
+                        x: Math.random() * this.w,
+                        y: Math.random() * this.h,
+                        ys: Math.random() + 1,
+                        height: scale * this.heartHeight,
+                        width: scale * this.heartWidth,
+                        opacity: scale
+                    })
+                }
+                setInterval($.proxy(this.draw, this), 30)
+            }
+        }
+        hearts.initialize()
     }
 }
 
@@ -1632,6 +1707,7 @@ function getQuest(item) {
                     }
                     if (questinfo !== null) {
                         str = str.replace('berrie(s)', idToItem[questinfo['item_id']].name)
+                        str = str.replace('Evolve {0} pokémon', 'Evolve {0} pokémon with a ' + idToItem[questinfo['item_id']].name)
                     } else {
                         str = str.replace('Evolve', 'Use a item to evolve')
                     }
@@ -1905,16 +1981,8 @@ function formatSpawnTime(seconds) {
 
 function spawnpointLabel(item) {
     var str = ''
-
-    // 60 minute
-    if (item.time > 1800) {
-        str += '<div><b>' + i8ln('Spawn Point (60)') + '</b></div>' +
-            '<div>' + i8ln('Spawn time') + ': xx:' + formatSpawnTime(item.time) + '</div>' +
-            '<div>' + i8ln('Despawn time') + ': xx:' + formatSpawnTime(item.time) + '</div>'
-    // 30 minute
-    } else if (item.time > 0) {
-        str += '<div><b>' + i8ln('Spawn Point (30)') + '</b></div>' +
-        '<div>' + i8ln('Spawn time') + ': xx:' + formatSpawnTime(item.time + 1800) + '</div>' +
+    if (item.time > 0) {
+        str += '<div><b>' + i8ln('Spawn Point') + '</b></div>' +
         '<div>' + i8ln('Despawn time') + ': xx:' + formatSpawnTime(item.time) + '</div>'
     } else {
         str += '<div>' + i8ln('Unknown spawnpoint info') + '</div>'
@@ -2995,14 +3063,11 @@ function deletePoi(event) { // eslint-disable-line no-unused-vars
 
 function setupSpawnpointMarker(item) {
     var color = ''
-    if (item['time'] > 1800) {
+    if (item['time'] > 0) {
         color = 'green'
-    } else if (item['time'] > 0) {
-        color = 'lightgreen'
     } else {
         color = 'red'
     }
-
     var rangeCircleOpts = {
         radius: 4,
         weight: 1,
@@ -5460,10 +5525,8 @@ function updateSpawnPoints() {
     $.each(mapData.spawnpoints, function (key, value) {
         if (map.getBounds().contains(value.marker.getLatLng())) {
             var color = ''
-            if (value['time'] > 1800) {
+            if (value['time'] > 0) {
                 color = 'green'
-            } else if (value['time'] > 0) {
-                color = 'lightgreen'
             } else {
                 color = 'red'
             }
